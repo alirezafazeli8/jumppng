@@ -1,0 +1,2 @@
+[console_scripts]
+jumppng = jumppng:jump_png

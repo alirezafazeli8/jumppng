@@ -1,3 +1,9 @@
+Metadata-Version: 2.1
+Name: jumppng
+Version: 0.1.1
+Description-Content-Type: text/markdown
+Requires-Dist: Pillow
+
 # JumpPng (Jpeg To PNG Converter)
 
 > Hi, im Alireza Fazeli and i made this application with love 😊❤
