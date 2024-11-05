@@ -2,114 +2,139 @@ import os
 import sys
 from PIL import Image
 
-app_version = "0.1.1"
+app_version = "0.2.1"
 
 
-def jump_png():
+def display_help():
+    help_message = r"""
+    --- Welcome ---
+    
+    Hi, I'm Alireza Fazeli, and I created this application with love.
+    This application is designed to make your life easier. Please follow my LinkedIn and GitHub:
+    https://linkedin.com/in/alirezafazeli
+    https://github.com/alirezafazeli8
+    
+    What do you need?
+    
+    You need two paths: 
+    1. The path to your JPEG file.
+       Example: "D:\\3- photo\\yakuza.jpg"
+    2. The destination path where you want to save the PNG.
+       Example: "C:\\Users\\Alireza\\Desktop"
+       
+    Commands:
+    -c, --convert : Convert your JPEG file to PNG.
+                    Example: python JpegToPngConverter.py -c "D:\\3- photo\\yakuza.jpg" "C:\\Users\\Alireza\\Desktop"
+                    
+    -h, --help : Display this help message.
+    
+    -v : Show the current version of the application.
+    
+    Bye bye :))))
+    
+    ---------------
+    """
+    print(help_message)
+
+
+def convert_image(file_path, save_file_path):
     try:
-        convert_command = sys.argv[1]
+        # Open user image
+        user_image = Image.open(file_path)
 
-        if convert_command == "-h" or convert_command == "--help":
-            message = r"""
-                        --- Welcome ---
-                        
-                        Hi, im Alireza Fazeli and i made this application with love.
-                        this application is very simple and i made this application to make easy your life.
-                        so pleas follow my linkedin and github :
-                        https://linkedin.com/in/alirezafazeli
-                        https://github.com/alirezafazeli8
-                        
-                        What you need ?
-                        
-                        first of all you need two path. first is your JPEG file path.
-                        
-                        for example : "D:\\3- photo\yakuza.jpg"
-                        
-                        and second is your destination path. 
-                        for example : "C:\Users\Alireza\Desktop"
-                        
-                        just this :). follow me and learn the commands.
-                        
-                        -c , --convert :
-                            with one of these commands you can convert your JPEG file to PNG.
-                            for example : python JpegToPngConverter.py -c "D:\\3- photo\yakuza.jpg" "C:\Users\Alireza\Desktop"
-                            
-                        -h , --help : 
-                            now you are in fucking help :))))
-                            
-                        -v : 
-                            you can see where we are. maybe later i or with your help , i develop more this app.
-                            
-                            
-                        bye bye :)))) 
+        # Extract base filename and create PNG path
+        file_name = os.path.splitext(os.path.basename(file_path))[0]
+        png_file_path = os.path.join(save_file_path, f"{file_name}.png")
 
-                        
-                        ---------------            
-                    """
+        # Save image as PNG
+        user_image.save(png_file_path, "PNG")
 
-            print(message)
-        elif convert_command == "-c" or convert_command == "--convert":
-
-            # get data user from terminal
-            file_path, save_file_path = sys.argv[2], sys.argv[3]
-
-            # open user Image
-            user_image = Image.open(file_path)
-
-            # find main file name
-            file_name = os.path.basename(file_path)[:-4:]
-
-            # save image as png
-            png_file_path = f"{save_file_path}\\{file_name}.png"
-            user_image.save(png_file_path, "png")
-
-            # done message
-            print(
-                f"""
-                    -- DONE ---
-                    Your File Saved In {png_file_path}
-                    -----------
-                    """
-            )
-
-        elif convert_command == "-v" or convert_command == "--version":
-            print(
-                f"""
-                ---Hi---
-                We are in first step
-                but now im in version {app_version}
-                --------
-                
-                """
-            )
-        else:
-            print(
-                """
-                        --- Error ---
-                        use -h or --help 
-                        -------------
-                    """
-            )
-    except IndexError:
         print(
-            """
-                   ---Invalid Command---
-                   use -h or --help
-                   ---------------------
-                  """
+            f"""
+        -- DONE ---
+        Your file has been saved at: {png_file_path}
+        -----------
+        """
         )
+
     except FileNotFoundError:
         print(
             """
-            -- Error --
-            i can't find the file
-            pleas insert correct file path
-            use -h or --help to know how to work
-            -----------
-            
+        -- Error --
+        I can't find the file. Please insert a correct file path.
+        Use -h or --help to know how to work.
+        -----------
+        """
+        )
+    except Exception as e:
+        print(
+            f"""
+        -- Error --
+        An unexpected error occurred: {e}
+        -----------
+        """
+        )
+
+
+def main():
+    try:
+        if len(sys.argv) == 3:
+            raise Exception
+        elif len(sys.argv) < 2:
+            raise IndexError
+
+        command = sys.argv[1]
+
+        if command in ("-h", "--help"):
+            display_help()
+
+        elif command in ("-c", "--convert") and len(sys.argv) == 4:
+            file_path = sys.argv[2]
+            save_file_path = sys.argv[3]
+            convert_image(file_path, save_file_path)
+
+        elif command in ("-v", "--version"):
+            print(
+                f"""
+            --- Hi ---
+            We are in the first step, and I'm currently at version {app_version}.
+            --------
             """
+            )
+
+        else:
+            print(
+                """
+            --- Error ---
+            Invalid command. Use -h or --help for help.
+            -------------
+            """
+            )
+
+    # Specific for windows users : handle error for cant find save file path
+    except Exception:
+        # find file path
+        file_path = sys.argv[2]
+
+        # make jumppng save file path
+        save_file_path = f"C:\\Users\\{os.getlogin()}\\Pictures\\jumppng\\"
+
+        # check folder exist or not if not exist create new jumppng folder
+        if os.path.exists(save_file_path):
+            convert_image(file_path, save_file_path)
+        else:
+            os.makedirs(save_file_path)
+            convert_image(file_path, save_file_path)
+
+    except IndexError:
+        print(
+            """
+        --- Invalid Command ---
+        Use -h or --help for help.
+        ---------------------
+        """
         )
 
 
 if __name__ == "__main__":
-    jump_png()
+    main()
