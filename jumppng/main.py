@@ -7,11 +7,7 @@ from tkinter import filedialog, messagebox
 # Version of the application
 app_version = "0.2.1"
 
-
 def display_help():
-    """
-    Display a help message in the console with usage instructions.
-    """
     help_message = r"""
     --- Welcome ---
     
@@ -40,15 +36,7 @@ def display_help():
     """
     print(help_message)
 
-
 def convert_image(file_path, save_file_path):
-    """
-    Convert a JPEG image to PNG and save it to the specified path.
-    
-    Parameters:
-    - file_path (str): Path of the JPEG file.
-    - save_file_path (str): Directory to save the PNG file.
-    """
     try:
         # Open the JPEG image file
         user_image = Image.open(file_path)
@@ -63,55 +51,71 @@ def convert_image(file_path, save_file_path):
         user_image.save(png_file_path, "PNG")
 
         # Show a success message
-        messagebox.showinfo("Conversion Successful", f"File saved at: {png_file_path}")
+        print(f"Your file has been saved at: {png_file_path}")
     except FileNotFoundError:
-        # Show an error message if file not found
-        messagebox.showerror("Error", "File not found. Please provide a valid file path.")
+        print("Error: File not found. Please provide a valid file path.")
     except Exception as e:
-        # Show any unexpected error
-        messagebox.showerror("Error", f"An unexpected error occurred: {e}")
-
+        print(f"An unexpected error occurred: {e}")
 
 def open_file_dialog():
-    """
-    Open a file dialog to select a JPEG file, and insert the file path in the entry widget.
-    """
     file_path = filedialog.askopenfilename(filetypes=[("JPEG files", "*.jpg;*.jpeg")])
     if file_path:
         entry_file_path.delete(0, tk.END)  # Clear any existing text
         entry_file_path.insert(0, file_path)  # Insert the selected file path
 
-
 def save_directory_dialog():
-    """
-    Open a dialog to select a directory to save the PNG file.
-    """
     directory_path = filedialog.askdirectory()
     if directory_path:
         entry_save_path.delete(0, tk.END)  # Clear any existing text
         entry_save_path.insert(0, directory_path)  # Insert the selected directory path
 
-
 def convert_button_action():
-    """
-    Action triggered when the convert button is pressed. It checks for file path and save path
-    and calls the convert_image function if both are provided.
-    """
     file_path = entry_file_path.get()
     save_file_path = entry_save_path.get()
     if file_path and save_file_path:
         convert_image(file_path, save_file_path)
     else:
-        # Show a warning if either file path or save path is missing
         messagebox.showwarning("Warning", "Please select both file and save path.")
 
+def main():
+    try:
+        if len(sys.argv) == 3:
+            raise Exception
+        elif len(sys.argv) < 2:
+            raise IndexError
 
-# Set up the main application window
+        command = sys.argv[1]
+
+        if command in ("-h", "--help"):
+            display_help()
+
+        elif command in ("-c", "--convert") and len(sys.argv) == 4:
+            file_path = sys.argv[2]
+            save_file_path = sys.argv[3]
+            convert_image(file_path, save_file_path)
+
+        elif command in ("-v", "--version"):
+            print(f"Currently at version {app_version}.")
+
+        else:
+            print("Invalid command. Use -h or --help for help.")
+
+    except Exception:
+        file_path = sys.argv[2]
+        save_file_path = f"C:\\Users\\{os.getlogin()}\\Pictures\\jumppng\\"
+        
+        if not os.path.exists(save_file_path):
+            os.makedirs(save_file_path)
+        convert_image(file_path, save_file_path)
+
+    except IndexError:
+        print("Invalid Command. Use -h or --help for help.")
+
+# GUI setup for the application
 root = tk.Tk()
 root.title("JPEG to PNG Converter")
 root.geometry("400x250")
 
-# Label and entry for selecting the JPEG file path
 label_file_path = tk.Label(root, text="Select JPEG File:")
 label_file_path.pack(pady=5)
 entry_file_path = tk.Entry(root, width=40)
@@ -119,7 +123,6 @@ entry_file_path.pack(pady=5)
 button_file_browse = tk.Button(root, text="Browse", command=open_file_dialog)
 button_file_browse.pack(pady=5)
 
-# Label and entry for selecting the save directory path
 label_save_path = tk.Label(root, text="Select Destination Directory:")
 label_save_path.pack(pady=5)
 entry_save_path = tk.Entry(root, width=40)
@@ -127,9 +130,7 @@ entry_save_path.pack(pady=5)
 button_save_browse = tk.Button(root, text="Browse", command=save_directory_dialog)
 button_save_browse.pack(pady=5)
 
-# Convert button
 button_convert = tk.Button(root, text="Convert to PNG", command=convert_button_action)
 button_convert.pack(pady=20)
 
-# Start the Tkinter main event loop
 root.mainloop()
